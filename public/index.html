@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Firebase Twitter</title>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css'>
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css'><link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!-- 
+  The home page 
+-->
+<div id="page1">
+  <h1 id="title">
+    <span>Welcome to Firebase Twitter!</span>
+  </h1>
+  <div id="center">
+    <span id="login"><button>LOGIN</button></span>
+    <span id="register"><button>REGISTER</button></span>
+  </div>
+  <div id="center">
+    <input placeholder="E-mail" type="text" id="email1">
+    <input placeholder="Password" type="password" id="pass1">
+  </div>
+  
+  
+  <div style="display: none;"><img src="https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png" id="fileupload2"/></div>
+  <br><br>
+  <div id="center"><button id="forgot">Forgot Password?</button></div>
+</div>
+
+<div class="hidden" id="page2">
+  <h1 id="title">
+    <span>Welcome to Firebase Twitter!</span>
+  </h1>
+  <div id="logout"><button>LOGOUT</button></div>
+  <div id="settings"><button>USER SETTINGS</button></div>
+
+  <div id="center"><input placeholder="Tweet" type="text" id="tweet1" size=100></div>
+
+  <div id="center"><span id="send"><button>SEND</button></span></div>
+
+  <div id="sessiondata"></div>
+</div>
+
+<div class="hidden" id="page3">
+  <div id="center">
+    <h1 id="title">
+      <span>Create Your Firebase Twitter Account</span>
+    </h1>
+    <div id="return"><button>Return to Home</button></div>
+  </div>
+  <div id="center">
+    <input id="user2" placeholder="E-mail" type="text">
+    <input id="pass2" placeholder="Password" type="password">
+    <span id="register2"><br><br><button>REGISTER ACCOUNT</button></span>
+  </div>
+</div>
+
+<div class="hidden" id="settings_page">
+  <h1 id="title">
+    <span>User Settings</span>
+  </h1>
+  <div id="return3">
+    <button>SAVE & RETURN</button>
+  </div>
+  <div id="center">
+    <input placeholder="Screen Name" type="text" id="user1">
+  </div>
+  <div id="center"><input type="file" id="fileupload" accept="image/png, image/jpeg, image/webp"/></div><br>
+  <div id="center"><input placeholder="Bio" type="text" id="bio"></div>
+</div>
+
+<div class="hidden" id="forgot_pass_page">
+  <h1 id="title">
+    <span>Enter Your E-mail Below</span>
+  </h1>
+  <br>
+  <div id="center">
+  <input placeholder="E-mail" type="text" id="email_pass_forgot">
+  </div>
+  <div id="center"><button id="send_email">SEND</button></div>
+  <div id="center"><div id="return4"><button>Return to Home</button></div></div>
+</div>
+
+<div class="hidden" id="profile_page">
+  <h1 id="title">
+    <span>User's Profile</span>
+  </h1>
+  <div id="return5"><button>Return to Tweets</button></div>
+  <div id="profiledata"></div>
+</div>
+<!-- partial -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.1/js/bootstrap.min.js'></script>
+<script src='https://www.gstatic.com/firebasejs/9.9.4/firebase-app-compat.js'></script>
+<script src='https://www.gstatic.com/firebasejs/9.9.4/firebase-database-compat.js'></script>
+<script src='https://www.gstatic.com/firebasejs/9.9.4/firebase-storage-compat.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/fontawesome-iconpicker/3.2.0/js/fontawesome-iconpicker.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery-awesome-cursor/0.3.1/jquery.awesome-cursor.min.js'></script>
+<script src='https://www.gstatic.com/firebasejs/9.9.4/firebase-auth-compat.js'></script><script type="module" src="./script.js"></script>
+
+</body>
+</html>
+

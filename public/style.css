@@ -1,0 +1,108 @@
+body {
+  background: linear-gradient(90deg, rgba(4,184,246,1) 20%, rgba(6,6,241,1) 50%, rgba(187,0,255,1) 80%);
+}
+
+.hidden {
+  display: none;
+}
+
+h1 span {
+  background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);
+  border-radius: 7px;
+}
+
+#title {
+  color: black;
+  text-align: center;
+  font-size: 40px;
+  font-family: 'Fugaz One';
+}
+
+#send {
+  text-align: center;
+}
+
+.user {
+  color: salmon;
+}
+
+.tweet {
+  color: steelblue;
+}
+
+#center {
+  text-align: center;
+}
+
+.follow {
+  text-align: right;
+}
+
+#return {
+  position: absolute; 
+  top: 0; 
+  right: 0; 
+  width: 100px; 
+ text-align:right;
+}
+
+#logout {
+  position: absolute; 
+  top: 0; 
+  right: 0; 
+  width: 100px; 
+ text-align:right;
+}
+
+#settings {
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  width: 100px; 
+ text-align:left;
+}
+
+#tweet1 {
+  width: 400px;
+}
+
+#return3 {
+  position: absolute; 
+  top: 0; 
+  right: 0; 
+  width: 100px; 
+ text-align:right;
+}
+
+#return4 {
+  position: absolute; 
+  top: 0; 
+  right: 0; 
+  width: 100px; 
+ text-align:right;
+}
+
+#return5 {
+  position: absolute; 
+  top: 0; 
+  right: 0; 
+  width: 100px; 
+ text-align:right;
+}
+
+#profile_data {
+  text-align: center;
+  font-family: 'Fugaz One';
+}
+
+.hidden2 {
+  display: none;
+}
+
+#bio_style {
+  background: orange;
+  color: red;
+  font-weight: 5px;
+  border-radius: 5px;
+  font-size: 20px;
+}
