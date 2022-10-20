@@ -31,36 +31,78 @@ var showNextPage = function() {
   document.getElementById('page2').classList.remove('hidden');
 }
 
+let helloFunc = (username, URL) => {
+  $("#hello").html(`
+    <div style="textarea: 200px;"><b>Hello ${username}!</div><br>
+    <img src="${URL}" style="width:100px; height:100px;border-radius: 5px;">
+  `);
+  currURL = URL;
+}
+
+$("#hello").on("click", evt => {
+  let bio = "";
+  if($("#bio").val() == "") bio = "No bio yet!";
+  else bio = $("#bio").val();
+  renderUserProfile($("#email1").val(), $("#user1").val(), currURL, bio);
+  document.getElementById('page2').classList.add('hidden');
+  document.getElementById('profile_page').classList.remove('hidden');
+});
+
+function gatherUserDataStart(ss) {
+  $("#user1").val(ss.val().username);
+  $("#bio").val(ss.val().bio);
+  helloFunc(ss.val().username, ss.val().URL);
+}
+
 function gatherUserData(uid) {
     firebase.database().ref('/users/' + uid).once("value", ss => {
-        $("#user1").val(ss.val().username);
-        $("#bio").val(ss.val().bio);
-        $("#fileupload").val(ss.val().URL);
+        gatherUserDataStart(ss);
+        currURL = ss.val().URL;
     });
+}
+
+let signIn = () => {
+  firebase.auth().signInWithEmailAndPassword($("#email1").val(), $("#pass1").val()).then((userCredential) => {
+    var user = userCredential.user;
+    currUID = user.uid;
+    let usersRef = rtdb.ref(db, `/users/${user.uid}`);
+    gatherUserData(user.uid);
+    showNextPage();
+  })
+    .catch((error) => {
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    alert(errorMessage);
+  });
+}
+
+let signInRegister = () => {
+  firebase.auth().signInWithEmailAndPassword($("#user2").val(), $("#pass2").val()).then((userCredential) => {
+    var user = userCredential.user;
+    currUID = user.uid;
+    let usersRef = rtdb.ref(db, `/users/${user.uid}`);
+    gatherUserData(user.uid);
+    showNextPage();
+  })
+    .catch((error) => {
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    alert(errorMessage);
+  });
 }
 
 let renderLogin = ()=>{
   $("#login").on("click", ()=>{
-    if($("#user1").val().includes("<") || $("#user1").val().includes(">")) {
-      alert("FORBIDDEN CHARACTER(S)");
-    }
+    if($("#user1").val().includes("<") || $("#user1").val().includes(">")) alert("FORBIDDEN CHARACTER(S)");
     else {
-      firebase.auth().signInWithEmailAndPassword($("#email1").val(), $("#pass1").val()).then((userCredential) => {
-        var user = userCredential.user;
-        currUID = user.uid;
-        let usersRef = rtdb.ref(db, `/users/${user.uid}`);
-        gatherUserData(user.uid);
-        showNextPage();
-      })
-      .catch((error) => {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        alert(errorMessage);
-      });
+      signIn();
     }
   });
 }
-renderLogin();
+firebase.auth().onAuthStateChanged(function (user) {
+  renderLogin();
+});
+//renderLogin();
 
 $("#register").on("click", ()=>{
   document.getElementById('page1').classList.add('hidden');
@@ -102,7 +144,7 @@ $("#return4").on("click", () => {
 });
 
 let renderReturnToHome2 = ()=>{
-  $("#logout").on("click", ()=>{
+  $("#logout2").on("click", ()=>{
     document.getElementById('page2').classList.add('hidden');
     document.getElementById('page1').classList.remove('hidden');
     $("#user1").val("");
@@ -122,16 +164,18 @@ $("#register2").on("click", evt => {
   else {
     firebase.auth().createUserWithEmailAndPassword($("#user2").val(), $("#pass2").val()).then((userCredential) => {
       let email = $("#user2").val();
+      $("#email1").val(email);
       let URL = "https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png";
       let bio = "";
-      let username = "";
+      let username = "Anonymous";
 
       const user = userCredential.user;
       let usersRef = rtdb.ref(db, `/users/${user.uid}`);
       if(usersRef) rtdb.set(usersRef, {email, URL, bio, username});
       alert("Account successfully created.\nWelcome to Firebase Twitter!")
       document.getElementById('page3').classList.add('hidden');
-      document.getElementById('page1').classList.remove('hidden');
+      document.getElementById('page2').classList.remove('hidden');
+      signInRegister();
       $("#user2").val("");
       $("#pass2").val("");
     })
@@ -147,6 +191,20 @@ $("#settings").on("click", evt => {
   document.getElementById('page2').classList.add('hidden');
   document.getElementById('settings_page').classList.remove('hidden');
 });
+
+let reRenderTweets = (tweetsObj, uid, newURL, newBio, newUsername)=>{
+  let newTweetsRef = rtdb.ref(db, `/tweets/${uid}`);
+  let newJSON = {
+    'URL': newURL,
+    'bio': newBio,
+    'date': tweetsObj.date,
+    'email': tweetsObj.email,
+    'likes': tweetsObj.likes,
+    'tweet': tweetsObj.tweet,
+    'username': newUsername
+  };
+  rtdb.update(newTweetsRef, newJSON);
+}
 
 $("#return3").on("click", evt => {
   if($("#user1").val().includes("<") || $("#user1").val().includes(">") || $("#bio").val().includes("<") || $("#bio").val().includes(">")) {
@@ -164,6 +222,7 @@ $("#return3").on("click", evt => {
       let myFile = $('#fileupload').prop('files')[0];
       if(!myFile) {
         let theURL = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
+        helloFunc($("#user1").val(), theURL);
         let newJSON = {
           'username': $("#user1").val(),
           'bio': $("#bio").val(),
@@ -181,6 +240,7 @@ $("#return3").on("click", evt => {
           contentType: myFile.type,
         }).then(ss=>{
               ss.ref.getDownloadURL().then((theURL)=>{
+                helloFunc($("#user1").val(), theURL);
                 let newJSON = {
                   'username': $("#user1").val(),
                   'bio': $("#bio").val(),
@@ -203,12 +263,24 @@ $("#return5").on("click", evt=>{
   $("#profiledata").text("");
 });
 
-let renderProfile = (email, username, imageURL, bio, uuid)=>{
+let renderProfile = (email, username, imageURL, bio)=>{
   $("#profiledata").prepend(`
     <div id="profile_data">
       <h3>Screen Name: ${username}</h3>
       <h6>Associated E-mail: ${email}</h6>
       <div>${imageURL}</div><br>
+      <span style="font-size: 30px; font-family: 'Fugaz One'; text-decoration: underline;">Bio</span>
+      <div><span id="bio_style">${bio}</span></div>
+    </div>
+  `);
+}
+
+let renderUserProfile = (email, username, imageURL, bio)=>{
+  $("#profiledata").prepend(`
+    <div id="profile_data">
+      <h3>Screen Name: ${username}</h3>
+      <h6>Associated E-mail: ${email}</h6>
+      <img src="${imageURL}" style="width:190px;height:190px;border-radius:7px;"><br>
       <span style="font-size: 30px; font-family: 'Fugaz One'; text-decoration: underline;">Bio</span>
       <div><span id="bio_style">${bio}</span></div>
     </div>
@@ -238,12 +310,12 @@ let renderTweet = (tweetsObj, uuid)=>{
 <div class="card mb-3" data-uuid="${uuid}" style="max-width: 540px; background-color: cyan; border-radius: 7px;">
   <div class="row g-0">
     <div class="col-md-4">
-      <i data-urlid="${uuid}"><img src=${tweetsObj.URL} style="width:190px;height:190px;"></i>
+      <i data-urlid="${uuid}"><img src=${tweetsObj.URL} style="width:190px;height:190px;border-radius:7px;"></i>
       </div>
     <div class="col-md-8">
       <div class="card-body">
         <h5 class="card-title" data-usernameid="${uuid}">${tweetsObj.username}</h5><span><button data-id="${uuid}">FOLLOW</button></span>
-        <p class="card-text"><small data-emailid="${uuid}" class="text-muted" style="border:3px blue solid;">${tweetsObj.email}</p></small>
+        <p class="card-text"><small data-emailid="${uuid}" class="text-muted" style="border:3px blue solid;border-radius:5px">${tweetsObj.email}</p></small>
         <p class="card-text">${tweetsObj.tweet}</p>
         <i data-tweetid="${uuid}" class="fa-solid fa-thumbs-up""></i>
         <p class="card-text">
@@ -293,7 +365,7 @@ rtdb.onChildAdded(tweetsRef, ss=>{
     }
   });
   $(`[data-emailid="${ss.key}"]`).on("click", evt => {
-    renderProfile($(`[data-emailid="${ss.key}"]`).text(), $(`[data-usernameid="${ss.key}"]`).text(), $(`[data-urlid="${ss.key}"]`).html(), $(`[data-bioid="${ss.key}"]`).text(), ss.key);
+    renderProfile($(`[data-emailid="${ss.key}"]`).text(), $(`[data-usernameid="${ss.key}"]`).text(), $(`[data-urlid="${ss.key}"]`).html(), $(`[data-bioid="${ss.key}"]`).text());
     document.getElementById('page2').classList.add('hidden');
     document.getElementById('profile_page').classList.remove('hidden');
   });
@@ -305,7 +377,7 @@ $("#send").on("click", evt=>{
   let email = $("#email1").val();
   let bio = $("#bio").val();
   let likes = 0;
-  let URL = "https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png";
+  let URL = currURL;
   let date = Date();
   
   let newRef = rtdb.push(tweetsRef);
