@@ -25,6 +25,7 @@ let db = rtdb.getDatabase(app);
 let renderedTweetLikeLookup = {};
 let currUID = "";
 let currURL = "";
+let currKey = "";
 
 var showNextPage = function() {
   document.getElementById('page1').classList.add('hidden');
@@ -32,8 +33,10 @@ var showNextPage = function() {
 }
 
 let helloFunc = (username, URL) => {
+  let user = username;
+  if(user == "") user = "Anonymous";
   $("#hello").html(`
-    <div style="textarea: 200px;"><b>Hello ${username}!</div><br>
+    <div style="textarea: 200px;"><b>Hello ${user}!</div><br>
     <img src="${URL}" style="width:100px; height:100px;border-radius: 5px;">
   `);
   currURL = URL;
@@ -132,8 +135,8 @@ let renderReturnToHome = ()=>{
     document.getElementById('page2').classList.add('hidden');
     document.getElementById('page3').classList.add('hidden');
     document.getElementById('page1').classList.remove('hidden');
-    document.getElementById('user2').value = "";
-    document.getElementById('pass2').value = "";
+    $("#user2").val("");
+    $("#pass2").val("");
   });
 }
 renderReturnToHome();
@@ -167,7 +170,7 @@ $("#register2").on("click", evt => {
       $("#email1").val(email);
       let URL = "https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png";
       let bio = "";
-      let username = "Anonymous";
+      let username = "";
 
       const user = userCredential.user;
       let usersRef = rtdb.ref(db, `/users/${user.uid}`);
@@ -192,18 +195,25 @@ $("#settings").on("click", evt => {
   document.getElementById('settings_page').classList.remove('hidden');
 });
 
-let reRenderTweets = (tweetsObj, uid, newURL, newBio, newUsername)=>{
-  let newTweetsRef = rtdb.ref(db, `/tweets/${uid}`);
-  let newJSON = {
-    'URL': newURL,
-    'bio': newBio,
-    'date': tweetsObj.date,
-    'email': tweetsObj.email,
-    'likes': tweetsObj.likes,
-    'tweet': tweetsObj.tweet,
-    'username': newUsername
-  };
-  rtdb.update(newTweetsRef, newJSON);
+let reRenderTweets = (newURL, newBio, newUsername, email)=>{
+  //alert(newURL); alert(newBio); alert(newUsername); alert(email);
+  firebase.database().ref(`/tweets/`).once('value', function(ss) {
+    ss.forEach(function (childTweet) {
+      if(childTweet.val().email == email) {
+        let newTweetsRef = rtdb.ref(db, `/tweets/${childTweet.key}`);
+        let newJSON = {
+          'URL': newURL,
+          'bio': newBio,
+          'date': childTweet.val().date,
+          'email': childTweet.val().email,
+          'likes': childTweet.val().likes,
+          'tweet': childTweet.val().tweet,
+          'username': newUsername
+        };
+        rtdb.update(newTweetsRef, newJSON);
+      }
+    });
+  });
 }
 
 $("#return3").on("click", evt => {
@@ -220,14 +230,20 @@ $("#return3").on("click", evt => {
     else {
       let usersRef = rtdb.ref(db, `/users/${currUID}`);
       let myFile = $('#fileupload').prop('files')[0];
+      let newURL = "";
+      let currEmail = "";
       if(!myFile) {
         let theURL = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
+        newURL = theURL;
         helloFunc($("#user1").val(), theURL);
         let newJSON = {
           'username': $("#user1").val(),
           'bio': $("#bio").val(),
           'URL': theURL
         };
+        firebase.database().ref(`/users/${currUID}`).once('value', function(ss) {
+          reRenderTweets(theURL, $("#bio").val(), $("#user1").val(), ss.val().email);
+        });
         rtdb.update(usersRef, newJSON);
       }
       else {
@@ -240,12 +256,16 @@ $("#return3").on("click", evt => {
           contentType: myFile.type,
         }).then(ss=>{
               ss.ref.getDownloadURL().then((theURL)=>{
+                newURL = theURL;
                 helloFunc($("#user1").val(), theURL);
                 let newJSON = {
                   'username': $("#user1").val(),
                   'bio': $("#bio").val(),
                   'URL': theURL
                 };
+                firebase.database().ref(`/users/${currUID}`).once('value', function(ss) {
+                  reRenderTweets(theURL, $("#bio").val(), $("#user1").val(), ss.val().email);
+                });
                 rtdb.update(usersRef, newJSON);
               })
             });
@@ -349,7 +369,7 @@ rtdb.onChildAdded(tweetsRef, ss=>{
       let clickedTweet = $(evt.currentTarget).attr("data-tweetid");
       let likeCount = renderedTweetLikeLookup[clickedTweet];
       let tweetRef = firebase.database().ref("/tweets").child(clickedTweet);
-      toggleLike(tweetRef, ss.key);
+      toggleLike(tweetRef, currUID);
     });
   $(`[data-id="${ss.key}"]`).on("click", evt => {
     if($(`[data-id="${ss.key}"]`).text() == "FOLLOW") {
@@ -399,7 +419,9 @@ $("#send").on("click", evt=>{
       if (tweet.length > 250) {
         alert("Tweet must be 250 characters or less.");
       }
-      else if (newRef) rtdb.set(newRef, {username, email, tweet, date, likes, bio, URL});
+      else if (newRef) {
+        rtdb.set(newRef, {username, email, tweet, date, likes, bio, URL});
+      }
     }
     else {
       fileReader.readAsArrayBuffer(myFile);
@@ -417,7 +439,9 @@ $("#send").on("click", evt=>{
             if (tweet.length > 250) {
               alert("Tweet must be 250 characters or less.");
             }
-            else if (newRef) rtdb.set(newRef, {username, email, tweet, date, likes, bio, URL});
+            else if (newRef) {
+              rtdb.set(newRef, {username, email, tweet, date, likes, bio, URL});
+            }
           })
         });
       });
