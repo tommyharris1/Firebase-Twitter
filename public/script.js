@@ -103,7 +103,13 @@ let renderLogin = ()=>{
   });
 }
 firebase.auth().onAuthStateChanged(function (user) {
-  renderLogin();
+  if(!!user) {
+    currUID = user.uid;
+    let usersRef = rtdb.ref(db, `/users/${user.uid}`);
+    gatherUserData(user.uid);
+    showNextPage();
+  }
+  else renderLogin();
 });
 //renderLogin();
 
@@ -148,6 +154,7 @@ $("#return4").on("click", () => {
 
 let renderReturnToHome2 = ()=>{
   $("#logout2").on("click", ()=>{
+    firebase.auth().signOut();
     document.getElementById('page2').classList.add('hidden');
     document.getElementById('page1').classList.remove('hidden');
     $("#user1").val("");

@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@500&display=swap');
+
+* {
+  font-family: 'Raleway', sans-serif;
+}
+
 body {
   background: linear-gradient(90deg, rgba(4,184,246,1) 20%, rgba(6,6,241,1) 50%, rgba(187,0,255,1) 80%);
 }
@@ -9,6 +15,9 @@ body {
 h1 span {
   background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);
   border-radius: 7px;
+  box-shadow: 0 3px hotpink;
+  border-color: black;
+  font-family: 'Raleway', sans-serif;
 }
 
 #title {
@@ -43,7 +52,7 @@ h1 span {
   top: 0; 
   right: 0; 
   width: 100px; 
- text-align:right;
+  text-align: right;
 }
 
 #logout {
@@ -51,7 +60,7 @@ h1 span {
   top: 0; 
   right: 0; 
   width: 100px; 
- text-align:right;
+  text-align:right;
 }
 
 #settings {
@@ -59,7 +68,7 @@ h1 span {
   top: 0; 
   left: 0; 
   width: 100px; 
- text-align:left;
+  text-align:left;
 }
 
 #tweet1 {
@@ -120,4 +129,43 @@ h1 span {
   position: relative; 
   right: 50px;
   word-wrap: break-word;
+}
+
+button {
+  position: relative;
+  top: -1px;
+  font-family: 'Raleway', sans-serif;
+  font-size: 16px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: blue;
+  background-color: lightgreen;
+  border: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  box-shadow: 0 4px green;
+}
+
+button:hover {background-color: lightblue}
+
+button:active {
+  background-color: lightgreen;
+  box-shadow: 0 6px green;
+  transform: translateY(4px);
+}
+
+::placeholder {
+  color: deeppink;
+  font-size: 16px;
+  font-family: 'Rockwell';
+}
+
+input {
+  border-radius: 7px;
+}
+
+#tweet1 {
+  height: 30px;
+  width: 500px;
 }
