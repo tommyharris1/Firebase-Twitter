@@ -54,6 +54,7 @@ $("#hello").on("click", evt => {
 function gatherUserDataStart(ss) {
   $("#user1").val(ss.val().username);
   $("#bio").val(ss.val().bio);
+  $("#email1").val(ss.val().email);
   helloFunc(ss.val().username, ss.val().URL);
 }
 
