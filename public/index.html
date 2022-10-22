@@ -34,17 +34,17 @@
 
 <div class="hidden" id="page2">
   <h1 id="title">
-    <span>Welcome to Firebase Twitter!</span>
+    <span>Welcome to Firebase Twitter!</span><br><br>
   </h1>
   <div id="logout">
-    <div id="hello"></div>
+    <div id="hello"></div><br>
     <button id="logout2">LOGOUT</button>
   </div>
   <div id="settings"><button>USER SETTINGS</button></div>
 
-  <div id="center"><input placeholder="Tweet" type="text" id="tweet1" size=100></div>
+  <div id="center"><textarea rows = "5" cols = "60" placeholder = "Tweet" type="text" id="tweet1" size=100></textarea></div>
 
-  <div id="center"><span id="send"><button>SEND</button></span></div>
+  <div id="center"><span id="send"><button>SEND</button></span></div><br><br>
 
   <div id="sessiondata"></div>
 </div>
@@ -66,15 +66,18 @@
 <div class="hidden" id="settings_page">
   <h1 id="title">
     <span>User Settings</span>
-  </h1>
+  </h1><br>
   <div id="return3">
     <button>SAVE & RETURN</button>
   </div>
+  <div id="exitReturn">
+    <button>EXIT & RETURN</button>
+  </div>
   <div id="center">
     <input placeholder="Screen Name" type="text" id="user1">
-  </div>
+  </div><br>
   <div id="center"><input type="file" id="fileupload" accept="image/png, image/jpeg, image/webp"/></div><br>
-  <div id="center"><input placeholder="Bio" type="text" id="bio"></div>
+  <div id="center"><textarea rows="5" cols="60" placeholder="Bio" type="text" id="bio"></textarea></div>
 </div>
 
 <div class="hidden" id="forgot_pass_page">
@@ -91,7 +94,7 @@
 
 <div class="hidden" id="profile_page">
   <h1 id="title">
-    <span>User's Profile</span>
+    <span>User's Profile</span><br>
   </h1>
   <div id="return5"><button>Return to Tweets</button></div>
   <div id="profiledata"></div>

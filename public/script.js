@@ -285,6 +285,26 @@ $("#return3").on("click", evt => {
   }
 });
 
+$("#exitReturn").on("click", evt => {
+  /*if($("#user1").val().includes("<") || $("#user1").val().includes(">") || $("#bio").val().includes("<") || $("#bio").val().includes(">")) {
+    alert("FORBIDDEN CHARACTER(S)");
+  }
+  else {
+    if ($("#user1").val().length > 50) {
+        alert("Username must be 50 characters or less.");
+    }
+    else if ($("#bio").val().length > 250) {
+        alert("Bio must be 250 characters or less.");
+    }
+  }*/
+  firebase.database().ref(`/users/${currUID}`).once('value', function(ss) {
+    $("#bio").val(ss.val().bio);
+    $("#user1").val(ss.val().username);
+  });
+  document.getElementById('settings_page').classList.add('hidden');
+  document.getElementById('page2').classList.remove('hidden');
+});
+
 $("#return5").on("click", evt=>{
   document.getElementById('profile_page').classList.add('hidden');
   document.getElementById('page2').classList.remove('hidden');
@@ -293,24 +313,26 @@ $("#return5").on("click", evt=>{
 
 let renderProfile = (email, username, imageURL, bio)=>{
   $("#profiledata").prepend(`
+    <br>
     <div id="profile_data">
       <h3>Screen Name: ${username}</h3>
       <h6>Associated E-mail: ${email}</h6>
       <div>${imageURL}</div><br>
       <span style="font-size: 30px; font-family: 'Fugaz One'; text-decoration: underline;">Bio</span>
-      <div><span id="bio_style">${bio}</span></div>
+      <br><br><div><span id="bio_style">${bio}</span></div>
     </div>
   `);
 }
 
 let renderUserProfile = (email, username, imageURL, bio)=>{
   $("#profiledata").prepend(`
+    <br>
     <div id="profile_data">
       <h3>Screen Name: ${username}</h3>
       <h6>Associated E-mail: ${email}</h6>
-      <img src="${imageURL}" style="width:190px;height:190px;border-radius:7px;"><br>
+      <img src="${imageURL}" style="width:190px;height:190px;border-radius:7px;"><br><br>
       <span style="font-size: 30px; font-family: 'Fugaz One'; text-decoration: underline;">Bio</span>
-      <div><span id="bio_style">${bio}</span></div>
+      <br><br><div><span id="bio_style">${bio}</span></div>
     </div>
   `);
 }
@@ -342,9 +364,8 @@ let renderTweet = (tweetsObj, uuid)=>{
       </div>
     <div class="col-md-8">
       <div class="card-body">
-        <h5 class="card-title" data-usernameid="${uuid}">${tweetsObj.username}</h5><span><button data-id="${uuid}">FOLLOW</button></span>
-        <p class="card-text"><small data-emailid="${uuid}" class="text-muted" style="border:3px blue solid;border-radius:5px">${tweetsObj.email}</p></small>
-        <p class="card-text">${tweetsObj.tweet}</p>
+        <span><h5 class="card-title" data-usernameid="${uuid}">${tweetsObj.username}   </h5><button data-emailid="${uuid}" class="text-muted" style="font-size:10px;margin-top:-1em;background-color:#0ca6f0;color:#0cf076;box-shadow: 0 4px #0c4af0;color:red;">${tweetsObj.email}</button></span><br><br><span class="followButton"><button data-id="${uuid}" style="margin-top:-1em;background-color:#0ca6f0;box-shadow: 0 4px #0c4af0;color:red;">FOLLOW</button></span>
+        <br><br><p class="card-text">${tweetsObj.tweet}</p>
         <i data-tweetid="${uuid}" class="fa-solid fa-thumbs-up""></i>
         <p class="card-text">
         <small class="text-muted" id="date">
@@ -369,6 +390,20 @@ let renderTweet = (tweetsObj, uuid)=>{
 let tweetsRef = rtdb.ref(db, `/tweets`);
 var storageRef = firebase.storage().ref();
 
+let triggerFollow = (ID, emailID, currEmail) => {
+  if(ID.text() == "FOLLOW") {
+    if(currEmail === emailID.text()) {
+      alert("You cannot follow yourself.");
+    }
+    else {
+      ID.text('UNFOLLOW');
+    }
+  }
+  else {
+    ID.text('FOLLOW');
+  }
+}
+
 rtdb.onChildAdded(tweetsRef, ss=>{
   let yourData = ss.val();
   renderTweet(yourData, ss.key);
@@ -380,20 +415,13 @@ rtdb.onChildAdded(tweetsRef, ss=>{
       toggleLike(tweetRef, currUID);
     });
   $(`[data-id="${ss.key}"]`).on("click", evt => {
-    if($(`[data-id="${ss.key}"]`).text() == "FOLLOW") {
-      if($("#email1").val() === $(`[data-emailid="${ss.key}"]`).text()) {
-        alert("You cannot follow yourself.");
-      }
-      else {
-        $(`[data-id="${ss.key}"]`).text('UNFOLLOW');
-      }
-    }
-    else {
-      $(`[data-id="${ss.key}"]`).text('FOLLOW');
-    }
+    triggerFollow($(`[data-id="${ss.key}"]`), $(`[data-emailid="${ss.key}"]`), $("#email1").val());
   });
   $(`[data-emailid="${ss.key}"]`).on("click", evt => {
-    renderProfile($(`[data-emailid="${ss.key}"]`).text(), $(`[data-usernameid="${ss.key}"]`).text(), $(`[data-urlid="${ss.key}"]`).html(), $(`[data-bioid="${ss.key}"]`).text());
+    renderProfile($(`[data-emailid="${ss.key}"]`).text(), 
+                  $(`[data-usernameid="${ss.key}"]`).text(), 
+                  $(`[data-urlid="${ss.key}"]`).html(),
+                  $(`[data-bioid="${ss.key}"]`).text());
     document.getElementById('page2').classList.add('hidden');
     document.getElementById('profile_page').classList.remove('hidden');
   });

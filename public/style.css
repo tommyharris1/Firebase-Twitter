@@ -5,7 +5,11 @@
 }
 
 body {
-  background: linear-gradient(90deg, rgba(4,184,246,1) 20%, rgba(6,6,241,1) 50%, rgba(187,0,255,1) 80%);
+  background: linear-gradient(90deg, rgba(89,89,241,1) 11%, rgba(248,85,177,1) 92%);
+  margin: 0 auto;
+  max-width: 93em;
+  line-height: 1.5;
+  padding: 1em 0em;
 }
 
 .hidden {
@@ -13,11 +17,15 @@ body {
 }
 
 h1 span {
-  background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);
+  background: #f00c80;
   border-radius: 7px;
   box-shadow: 0 3px hotpink;
   border-color: black;
   font-family: 'Raleway', sans-serif;
+}
+
+h5 {
+  display: inline;
 }
 
 #title {
@@ -66,7 +74,7 @@ h1 span {
 #settings {
   position: absolute; 
   top: 0; 
-  left: 0; 
+  left: 5; 
   width: 100px; 
   text-align:left;
 }
@@ -78,7 +86,7 @@ h1 span {
 #return3 {
   position: absolute; 
   top: 0; 
-  right: 0; 
+  right: 1.4em; 
   width: 100px; 
  text-align:right;
 }
@@ -94,9 +102,9 @@ h1 span {
 #return5 {
   position: absolute; 
   top: 0; 
-  right: 0; 
+  right: 1.4em; 
   width: 100px; 
- text-align:right;
+  text-align:right;
 }
 
 #profile_data {
@@ -120,6 +128,9 @@ h1 span {
 }
 
 #hello {
+  position: absolute;
+  top: 1em;
+  left: -4.5em;
   background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);
   font-family: 'Fugaz One';
   text-align: center;
@@ -129,6 +140,7 @@ h1 span {
   position: relative; 
   right: 50px;
   word-wrap: break-word;
+  box-shadow: 0 3px lightblue;
 }
 
 button {
@@ -145,6 +157,10 @@ button {
   border: 1px solid transparent;
   border-radius: 8px;
   box-shadow: 0 4px green;
+  line-height: 1.5;
+  padding: 0.25em 0.5em;
+  margin-top: 1em;
+  padding-top: 0.2em;
 }
 
 button:hover {background-color: lightblue}
@@ -166,6 +182,22 @@ input {
 }
 
 #tweet1 {
-  height: 30px;
+  height: 100px;
   width: 500px;
+  word-break: break-word;
+}
+
+#logout2 {
+  right: 1.4em;
+}
+
+#user1 {
+  width: 20em;
+}
+
+#exitReturn {
+  position: absolute;  
+  right: 1.4em; 
+  width: 100px; 
+  text-align:right;
 }
