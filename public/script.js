@@ -1,12 +1,9 @@
-// Import the functions you need from the SDKs you need
- import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-app.js";
- //import { getStorage, ref } from "/firebase/storage";
- import * as rtdb from "https://www.gstatic.com/firebasejs/9.9.4/firebase-database.js";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// Firebase imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-app.js";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+import * as rtdb from "https://www.gstatic.com/firebasejs/9.9.4/firebase-database.js";
+
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyB084cEPTJQlv3KXGFYQjrM1GD8uN0xxE4",
   authDomain: "twitter-8097c.firebaseapp.com",
@@ -18,23 +15,20 @@ const firebaseConfig = {
   measurementId: "G-E6DY60MKNM"
 };
 
+// Firebase initializations
 firebase.initializeApp(firebaseConfig);
 const app = initializeApp(firebaseConfig);
 let db = rtdb.getDatabase(app);
 
+// Global variables - primarily for current user info
 let renderedTweetLikeLookup = {};
 let currUID = "";
-let currURL = "";
-let currKey = "";
+let currURL = ""; // User's current profile picture
 
-var showNextPage = function() {
-  document.getElementById('page1').classList.add('hidden');
-  document.getElementById('page2').classList.remove('hidden');
-}
-
+// Shows logged-in user in corner of tweets page
 let helloFunc = (username, URL) => {
   let user = username;
-  if(user == "") user = "Anonymous";
+  if (user == "") user = "Anonymous";
   $("#hello").html(`
     <div style="textarea: 200px;"><b>Hello ${user}!</div><br>
     <img src="${URL}" style="width:100px; height:100px;border-radius: 5px;">
@@ -42,172 +36,72 @@ let helloFunc = (username, URL) => {
   currURL = URL;
 }
 
-$("#hello").on("click", evt => {
-  let bio = "";
-  if($("#bio").val() == "") bio = "No bio yet!";
-  else bio = $("#bio").val();
-  renderUserProfile($("#email1").val(), $("#user1").val(), currURL, bio);
-  document.getElementById('page2').classList.add('hidden');
-  document.getElementById('profile_page').classList.remove('hidden');
-});
-
-function gatherUserDataStart(ss) {
-  $("#user1").val(ss.val().username);
-  $("#bio").val(ss.val().bio);
-  $("#email1").val(ss.val().email);
-  helloFunc(ss.val().username, ss.val().URL);
+// Retrieves user info from database upon new login
+let gatherUserData = (uid) => {
+  firebase.database().ref('/users/' + uid).once("value", ss => {
+    $("#screen_name").val(ss.val().username);
+    $("#bio").val(ss.val().bio);
+    $("#login_email").val(ss.val().email);
+    helloFunc(ss.val().username, ss.val().URL);
+    currURL = ss.val().URL;
+  });
 }
 
-function gatherUserData(uid) {
-    firebase.database().ref('/users/' + uid).once("value", ss => {
-        gatherUserDataStart(ss);
-        currURL = ss.val().URL;
-    });
+// Detects sign-in/register sign-in and adjusts user data accordingly
+let userSignInOrRegister = (user) => {
+  currUID = user.uid;
+  let usersRef = rtdb.ref(db, `/users/${user.uid}`);
+  gatherUserData(user.uid);
+  $('#welcome_page').addClass('hidden');
+  $('#main_page').removeClass('hidden');
 }
 
+// Error handler
+let catchError = (error) => {
+  var errorCode = error.code;
+  var errorMessage = error.message;
+  alert(errorMessage);
+}
+
+// Regular sign-in
 let signIn = () => {
-  firebase.auth().signInWithEmailAndPassword($("#email1").val(), $("#pass1").val()).then((userCredential) => {
-    var user = userCredential.user;
-    currUID = user.uid;
-    let usersRef = rtdb.ref(db, `/users/${user.uid}`);
-    gatherUserData(user.uid);
-    showNextPage();
-  })
-    .catch((error) => {
-    var errorCode = error.code;
-    var errorMessage = error.message;
-    alert(errorMessage);
-  });
-}
-
-let signInRegister = () => {
-  firebase.auth().signInWithEmailAndPassword($("#user2").val(), $("#pass2").val()).then((userCredential) => {
-    var user = userCredential.user;
-    currUID = user.uid;
-    let usersRef = rtdb.ref(db, `/users/${user.uid}`);
-    gatherUserData(user.uid);
-    showNextPage();
-  })
-    .catch((error) => {
-    var errorCode = error.code;
-    var errorMessage = error.message;
-    alert(errorMessage);
-  });
-}
-
-let renderLogin = ()=>{
-  $("#login").on("click", ()=>{
-    if($("#user1").val().includes("<") || $("#user1").val().includes(">")) alert("FORBIDDEN CHARACTER(S)");
-    else {
-      signIn();
-    }
-  });
-}
-firebase.auth().onAuthStateChanged(function (user) {
-  if(!!user) {
-    currUID = user.uid;
-    let usersRef = rtdb.ref(db, `/users/${user.uid}`);
-    gatherUserData(user.uid);
-    showNextPage();
-  }
-  else renderLogin();
-});
-//renderLogin();
-
-$("#register").on("click", ()=>{
-  document.getElementById('page1').classList.add('hidden');
-  document.getElementById('page3').classList.remove('hidden');
-});
-
-$("#forgot").on("click", evt => {
-  document.getElementById('page1').classList.add('hidden');
-  document.getElementById('forgot_pass_page').classList.remove('hidden');
-});
-
-$("#send_email").on("click", evt => {
-  firebase.auth().sendPasswordResetEmail($("#email_pass_forgot").val()).then(() => {
-      alert("A reset password e-mail has been sent.\nIf you do not see the e-mail, please check your spam folder.");
-    document.getElementById('forgot_pass_page').classList.add('hidden');
-    document.getElementById('page1').classList.remove('hidden');
+  firebase.auth().signInWithEmailAndPassword($("#login_email").val(), $("#login_pass").val()).then((userCredential) => {
+    let user = userCredential.user;
+    userSignInOrRegister(user);
   })
   .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    alert(errorMessage);
-  });
-});
-
-let renderReturnToHome = ()=>{
-  $("#return").on("click", ()=>{
-    document.getElementById('page2').classList.add('hidden');
-    document.getElementById('page3').classList.add('hidden');
-    document.getElementById('page1').classList.remove('hidden');
-    $("#user2").val("");
-    $("#pass2").val("");
+    catchError(error);
   });
 }
-renderReturnToHome();
 
-$("#return4").on("click", () => {
-  document.getElementById('forgot_pass_page').classList.add('hidden');
-  document.getElementById('page1').classList.remove('hidden');
-});
-
-let renderReturnToHome2 = ()=>{
-  $("#logout2").on("click", ()=>{
-    firebase.auth().signOut();
-    document.getElementById('page2').classList.add('hidden');
-    document.getElementById('page1').classList.remove('hidden');
-    $("#user1").val("");
-    $("#email1").val("");
-    $("#pass1").val("");
-    $("#tweet1").val("");
-    $("#fileupload").val("");
-    $("#bio").val("");
+// Sign-in upon registering new account
+let signInRegister = () => {
+  firebase.auth().signInWithEmailAndPassword($("#register_email").val(), $("#register_pass").val()).then((userCredential) => {
+    userSignInOrRegister(userCredential.user);
+  })
+  .catch((error) => {
+    catchError(error);
   });
 }
-renderReturnToHome2();
 
-$("#register2").on("click", evt => {
-  if($("#user2").val().includes("<") || $("#user2").val().includes(">") || $("#pass2").val().includes("<") || $("#pass2").val().includes(">")) {
-    alert("FORBIDDEN CHARACTER(S)");
-  }
-  else {
-    firebase.auth().createUserWithEmailAndPassword($("#user2").val(), $("#pass2").val()).then((userCredential) => {
-      let email = $("#user2").val();
-      $("#email1").val(email);
-      let URL = "https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png";
-      let bio = "";
-      let username = "";
+// XSS prevention (may or may not work)
+let sanitize = (str) => {
+  return str.includes("<") || str.includes(">");
+}
 
-      const user = userCredential.user;
-      let usersRef = rtdb.ref(db, `/users/${user.uid}`);
-      if(usersRef) rtdb.set(usersRef, {email, URL, bio, username});
-      alert("Account successfully created.\nWelcome to Firebase Twitter!")
-      document.getElementById('page3').classList.add('hidden');
-      document.getElementById('page2').classList.remove('hidden');
-      signInRegister();
-      $("#user2").val("");
-      $("#pass2").val("");
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      alert(errorMessage);
-    });
-  }
-});
+// Log-in handler for onAuthStateChanged
+let renderLogin = ()=>{
+  $("#login").on("click", () => {
+    if (sanitize($("#login_pass").val()) || sanitize($("#login_email").val())) alert("FORBIDDEN CHARACTER(S)");
+    else signIn();
+  });
+}
 
-$("#settings").on("click", evt => {
-  document.getElementById('page2').classList.add('hidden');
-  document.getElementById('settings_page').classList.remove('hidden');
-});
-
+// Updates previous tweets for current logged-in user
 let reRenderTweets = (newURL, newBio, newUsername, email)=>{
-  //alert(newURL); alert(newBio); alert(newUsername); alert(email);
   firebase.database().ref(`/tweets/`).once('value', function(ss) {
     ss.forEach(function (childTweet) {
-      if(childTweet.val().email == email) {
+      if (childTweet.val().email == email) {
         let newTweetsRef = rtdb.ref(db, `/tweets/${childTweet.key}`);
         let newJSON = {
           'URL': newURL,
@@ -224,37 +118,139 @@ let reRenderTweets = (newURL, newBio, newUsername, email)=>{
   });
 }
 
-$("#return3").on("click", evt => {
-  if($("#user1").val().includes("<") || $("#user1").val().includes(">") || $("#bio").val().includes("<") || $("#bio").val().includes(">")) {
-    alert("FORBIDDEN CHARACTER(S)");
-  }
+// Updates user data and previous tweets
+let saveUserData = (theURL, usersRef) => {
+  helloFunc($("#screen_name").val(), theURL);
+  let newJSON = {
+    'username': $("#screen_name").val(),
+    'bio': $("#bio").val(),
+    'URL': theURL
+  };
+  firebase.database().ref(`/users/${currUID}`).once('value', function(ss) {
+    reRenderTweets(theURL, $("#bio").val(), $("#screen_name").val(), ss.val().email);
+  });
+  rtdb.update(usersRef, newJSON);
+}
+
+// Render's logged-in user's profile
+$("#hello").on("click", evt => {
+  let bio = "";
+  if ($("#bio").val() == "") bio = "No bio yet!"; // If user's bio is empty
+  else bio = $("#bio").val();
+  renderUserProfile($("#login_email").val(), $("#screen_name").val(), currURL, bio);
+  $('#main_page').addClass('hidden');
+  $('#profile_page').removeClass('hidden');
+});
+
+// Renders page and data based on log-in status
+firebase.auth().onAuthStateChanged(function (user) {
+  if (!!user) userSignInOrRegister(user);
+  else renderLogin();
+  $("#tweet").val("");
+});
+
+// Change to register page
+$("#register").on("click", ()=>{
+  $('#welcome_page').addClass('hidden');
+  $('#register_page').removeClass('hidden');
+});
+
+// Change to forgot password page
+$("#forgot").on("click", evt => {
+  $('#welcome_page').addClass('hidden');
+  $('#forgot_pass_page').removeClass('hidden');
+});
+
+// Sends forgot password email to specified email address
+$("#send_email").on("click", evt => {
+  firebase.auth().sendPasswordResetEmail($("#email_pass_forgot").val()).then(() => {
+    alert("A reset password e-mail has been sent.\nIf you do not see the e-mail, please check your spam folder.");
+    $('#forgot_pass_page').addClass('hidden');
+    $('#welcome_page').removeClass('hidden');
+  })
+  .catch((error) => {
+    catchError(error);
+  });
+});
+
+// Return to welcome page from register page
+$("#return_to_home").on("click", ()=>{
+  $('#main_page').addClass('hidden');
+  $('#register_page').addClass('hidden');
+  $('#welcome_page').removeClass('hidden');
+  $("#register_email").val("");
+  $("#register_pass").val("");
+});
+
+// Return to welcome page from forgot password page
+$("#return_to_home2").on("click", () => {
+  $('#forgot_pass_page').addClass('hidden');
+  $('#welcome_page').removeClass('hidden');
+});
+
+// Log-out handler
+$("#logout").on("click", ()=>{
+  firebase.auth().signOut();
+  $('#main_page').addClass('hidden');
+  $('#welcome_page').removeClass('hidden');
+  $("#screen_name").val("");
+  $("#login_email").val("");
+  $("#login_pass").val("");
+  $("#tweet").val("");
+  $("#pic_upload").val("");
+  $("#bio").val("");
+});
+
+// Register account handler
+$("#register_account").on("click", evt => {
+  if (sanitize($("#register_email").val()) || sanitize($("#register_pass").val())) alert("FORBIDDEN CHARACTER(S)");
   else {
-    if ($("#user1").val().length > 50) {
-        alert("Username must be 50 characters or less.");
-    }
-    else if ($("#bio").val().length > 250) {
-        alert("Bio must be 250 characters or less.");
-    }
+    // Creates user and stores info in Firebase
+    firebase.auth().createUserWithEmailAndPassword($("#register_email").val(), $("#register_pass").val()).then((userCredential) => {
+      let email = $("#register_email").val();
+      $("#login_email").val(email);
+      let URL = "https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png"; // Default profile picture
+      let bio = "";
+      let username = "";
+      const user = userCredential.user;
+      let usersRef = rtdb.ref(db, `/users/${user.uid}`); // Reference to user info in Firebase
+      if (usersRef) rtdb.set(usersRef, {email, URL, bio, username}); // Set user info in Firebase
+      alert("Account successfully created.\nWelcome to Firebase Twitter!")
+      $('#register_page').addClass('hidden');
+      $('#main_page').removeClass('hidden');
+      $("#register_email").val("");
+      $("#register_pass").val("");
+      signInRegister();
+    })
+    .catch((error) => {
+      catchError(error);
+    });
+  }
+});
+
+// Settings button handler
+$("#settings").on("click", evt => {
+  $('#main_page').addClass('hidden');
+  $('#settings_page').removeClass('hidden');
+});
+
+// Determines how to save user data within the user settings page
+$("#save_return").on("click", evt => {
+  if (sanitize($("#screen_name").val()) || sanitize($("#bio").val())) alert("FORBIDDEN CHARACTER(S)");
+  else {
+    if ($("#screen_name").val().length > 50) alert("Username must be 50 characters or less.");
+    else if ($("#bio").val().length > 250) alert("Bio must be 250 characters or less.");
     else {
       let usersRef = rtdb.ref(db, `/users/${currUID}`);
-      let myFile = $('#fileupload').prop('files')[0];
+      let myFile = $('#pic_upload').prop('files')[0];
       let newURL = "";
       let currEmail = "";
-      if(!myFile) {
+      if (!myFile) { // If no file is selected
         let theURL = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
         newURL = theURL;
-        helloFunc($("#user1").val(), theURL);
-        let newJSON = {
-          'username': $("#user1").val(),
-          'bio': $("#bio").val(),
-          'URL': theURL
-        };
-        firebase.database().ref(`/users/${currUID}`).once('value', function(ss) {
-          reRenderTweets(theURL, $("#bio").val(), $("#user1").val(), ss.val().email);
-        });
-        rtdb.update(usersRef, newJSON);
+        saveUserData(theURL, usersRef);
       }
-      else {
+      else { // Set-up filereader event for when a file is selected
         const fileReader = new FileReader();
         fileReader.readAsArrayBuffer(myFile);
           fileReader.addEventListener("load", async (evt)=>{
@@ -265,54 +261,37 @@ $("#return3").on("click", evt => {
         }).then(ss=>{
               ss.ref.getDownloadURL().then((theURL)=>{
                 newURL = theURL;
-                helloFunc($("#user1").val(), theURL);
-                let newJSON = {
-                  'username': $("#user1").val(),
-                  'bio': $("#bio").val(),
-                  'URL': theURL
-                };
-                firebase.database().ref(`/users/${currUID}`).once('value', function(ss) {
-                  reRenderTweets(theURL, $("#bio").val(), $("#user1").val(), ss.val().email);
-                });
-                rtdb.update(usersRef, newJSON);
+                saveUserData(theURL, usersRef);
               })
             });
           });
       }
-      document.getElementById('settings_page').classList.add('hidden');
-      document.getElementById('page2').classList.remove('hidden');
+      $('#settings_page').addClass('hidden');
+      $('#main_page').removeClass('hidden');
     }
   }
 });
 
-$("#exitReturn").on("click", evt => {
-  /*if($("#user1").val().includes("<") || $("#user1").val().includes(">") || $("#bio").val().includes("<") || $("#bio").val().includes(">")) {
-    alert("FORBIDDEN CHARACTER(S)");
-  }
-  else {
-    if ($("#user1").val().length > 50) {
-        alert("Username must be 50 characters or less.");
-    }
-    else if ($("#bio").val().length > 250) {
-        alert("Bio must be 250 characters or less.");
-    }
-  }*/
+// Returns to tweets page without saving new user data
+$("#exit_return").on("click", evt => {
   firebase.database().ref(`/users/${currUID}`).once('value', function(ss) {
     $("#bio").val(ss.val().bio);
-    $("#user1").val(ss.val().username);
+    $("#screen_name").val(ss.val().username);
   });
-  document.getElementById('settings_page').classList.add('hidden');
-  document.getElementById('page2').classList.remove('hidden');
+  $('#settings_page').addClass('hidden');
+  $('#main_page').removeClass('hidden');
 });
 
-$("#return5").on("click", evt=>{
-  document.getElementById('profile_page').classList.add('hidden');
-  document.getElementById('page2').classList.remove('hidden');
-  $("#profiledata").text("");
+// Returns to tweets page
+$("#return_to_tweets").on("click", evt=>{
+  $('#profile_page').addClass('hidden');
+  $('#main_page').removeClass('hidden');
+  $("#profile_data").text("");
 });
 
+// Generate a given user's profile page
 let renderProfile = (email, username, imageURL, bio)=>{
-  $("#profiledata").prepend(`
+  $("#profile_data").prepend(`
     <br>
     <div id="profile_data">
       <h3>Screen Name: ${username}</h3>
@@ -324,10 +303,10 @@ let renderProfile = (email, username, imageURL, bio)=>{
   `);
 }
 
+// Renders a given user profile with parameters that provide the needed data
 let renderUserProfile = (email, username, imageURL, bio)=>{
-  $("#profiledata").prepend(`
-    <br>
-    <div id="profile_data">
+  $("#profile_data").prepend(`
+    <br><div id="profile_data">
       <h3>Screen Name: ${username}</h3>
       <h6>Associated E-mail: ${email}</h6>
       <img src="${imageURL}" style="width:190px;height:190px;border-radius:7px;"><br><br>
@@ -337,6 +316,7 @@ let renderUserProfile = (email, username, imageURL, bio)=>{
   `);
 }
 
+// Likes count handler
 let toggleLike = (tweetRef, uid) => {
   tweetRef.transaction((tweetObj) => {
     if (tweetObj) {
@@ -355,12 +335,13 @@ let toggleLike = (tweetRef, uid) => {
   });
 }
 
+// Large handler for displaying tweets
 let renderTweet = (tweetsObj, uuid)=>{
-  $("#sessiondata").prepend(`
+  $("#all_tweets").prepend(`
 <div class="card mb-3" data-uuid="${uuid}" style="max-width: 540px; background-color: cyan; border-radius: 7px;">
   <div class="row g-0">
     <div class="col-md-4">
-      <i data-urlid="${uuid}"><img src=${tweetsObj.URL} style="width:190px;height:190px;border-radius:7px;"></i>
+      <i data-urlid="${uuid}"><img src=${tweetsObj.URL}  style="width:190px;height:190px;border-radius:7px;"></i>
       </div>
     <div class="col-md-8">
       <div class="card-body">
@@ -379,6 +360,7 @@ let renderTweet = (tweetsObj, uuid)=>{
   </div>
 </div>
 `);
+  // Individual likes for each tweet
   renderedTweetLikeLookup[uuid] = tweetsObj.likes;
   firebase.database().ref("/tweets").child(uuid).child("likes").on("value", ss=>{
     renderedTweetLikeLookup[uuid] = ss.val();
@@ -386,24 +368,20 @@ let renderTweet = (tweetsObj, uuid)=>{
     });
 }
 
-// Initialize Firebase
+// Reference to tweets in Firebase
 let tweetsRef = rtdb.ref(db, `/tweets`);
 var storageRef = firebase.storage().ref();
 
+// Follow button(s) handler (not much functionality here)
 let triggerFollow = (ID, emailID, currEmail) => {
-  if(ID.text() == "FOLLOW") {
-    if(currEmail === emailID.text()) {
-      alert("You cannot follow yourself.");
-    }
-    else {
-      ID.text('UNFOLLOW');
-    }
+  if (ID.text() == "FOLLOW") {
+    if (currEmail === emailID.text()) alert("You cannot follow yourself.");
+    else ID.text('UNFOLLOW');
   }
-  else {
-    ID.text('FOLLOW');
-  }
+  else ID.text('FOLLOW');
 }
 
+// Handles events for when tweets are added to Firebase
 rtdb.onChildAdded(tweetsRef, ss=>{
   let yourData = ss.val();
   renderTweet(yourData, ss.key);
@@ -415,52 +393,49 @@ rtdb.onChildAdded(tweetsRef, ss=>{
       toggleLike(tweetRef, currUID);
     });
   $(`[data-id="${ss.key}"]`).on("click", evt => {
-    triggerFollow($(`[data-id="${ss.key}"]`), $(`[data-emailid="${ss.key}"]`), $("#email1").val());
+    triggerFollow($(`[data-id="${ss.key}"]`), 
+                  $(`[data-emailid="${ss.key}"]`), 
+                  $("#login_email").val());
   });
   $(`[data-emailid="${ss.key}"]`).on("click", evt => {
     renderProfile($(`[data-emailid="${ss.key}"]`).text(), 
                   $(`[data-usernameid="${ss.key}"]`).text(), 
                   $(`[data-urlid="${ss.key}"]`).html(),
                   $(`[data-bioid="${ss.key}"]`).text());
-    document.getElementById('page2').classList.add('hidden');
-    document.getElementById('profile_page').classList.remove('hidden');
+    $('#main_page').addClass('hidden');
+    $('#profile_page').removeClass('hidden');
   });
 });
 
+// Large handler for when tweets are sent
 $("#send").on("click", evt=>{
-  let username = $("#user1").val();
-  let tweet = $("#tweet1").val();
-  let email = $("#email1").val();
+  let username = $("#screen_name").val();
+  let tweet = $("#tweet").val();
+  let email = $("#login_email").val();
   let bio = $("#bio").val();
   let likes = 0;
   let URL = currURL;
   let date = Date();
-  
   let newRef = rtdb.push(tweetsRef);
-  
   const fileReader = new FileReader();
-  let myFile = $('#fileupload').prop('files')[0];
-  if($("#tweet1").val().includes("<") || $("#tweet1").val().includes(">")) {
+  let myFile = $('#pic_upload').prop('files')[0];
+  if ($("#tweet").val().includes("<") || $("#tweet").val().includes(">")) {
     alert("FORBIDDEN CHARACTER(S)");
   }
   else {
-    if(!myFile) {
-      if(username == "") username = "Anonymous";
-      if(tweet == "") tweet = "Untitled";
-      if(bio == "") bio = "No bio yet!";
+    if (!myFile) {
+      if (username == "") username = "Anonymous";
+      if (tweet == "") tweet = "Untitled";
+      if (bio == "") bio = "No bio yet!";
       let theURL = "https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png";
       $("#output").html(`
         <img src="${theURL}" style="width:190px;height:190px;"/>
       `);
-      if (tweet.length > 250) {
-        alert("Tweet must be 250 characters or less.");
-      }
-      else if (newRef) {
-        rtdb.set(newRef, {username, email, tweet, date, likes, bio, URL});
-      }
+      if (tweet.length > 250) alert("Tweet must be 250 characters or less.");
+      else if (newRef) rtdb.set(newRef, {username, email, tweet, date, likes, bio, URL});
     }
     else {
-      fileReader.readAsArrayBuffer(myFile);
+      fileReader.readAsArrayBuffer(myFile); // File reader for displaying profile pic on tweet(s)
       fileReader.addEventListener("load", async (evt)=>{
         let theFileData = fileReader.result;
         let storageDest = storageRef.child(myFile.name);
@@ -472,19 +447,15 @@ $("#send").on("click", evt=>{
             $("#output").html(`
      <img src="${theURL}" style="width:190px;height:190px;"/>
             `);
-            if (tweet.length > 250) {
-              alert("Tweet must be 250 characters or less.");
-            }
-            else if (newRef) {
-              rtdb.set(newRef, {username, email, tweet, date, likes, bio, URL});
-            }
+            if (tweet.length > 250) alert("Tweet must be 250 characters or less.");
+            else if (newRef) rtdb.set(newRef, {username, email, tweet, date, likes, bio, URL});
           })
         });
       });
     }
   }
   
-  if(username == "") username = "Anonymous";
-  if(tweet == "") tweet = "Untitled";
-  if(bio == "") bio = "No bio yet!";
+  if (username == "") username = "Anonymous";
+  if (tweet == "") tweet = "Untitled";
+  if (bio == "") bio = "No bio yet!";
 });

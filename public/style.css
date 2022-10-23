@@ -1,9 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@500&display=swap');
 
+/* Universal, professional-looking font for nearly everything on Firebase Twitter */
 * {
   font-family: 'Raleway', sans-serif;
 }
 
+/* Background and default spacing for all pages */
 body {
   background: linear-gradient(90deg, rgba(89,89,241,1) 11%, rgba(248,85,177,1) 92%);
   margin: 0 auto;
@@ -12,10 +14,12 @@ body {
   padding: 1em 0em;
 }
 
+/* Storage for non-current pages */
 .hidden {
   display: none;
 }
 
+/* Background for titles of pages */
 h1 span {
   background: #f00c80;
   border-radius: 7px;
@@ -28,6 +32,7 @@ h5 {
   display: inline;
 }
 
+/* More details for titles */
 #title {
   color: black;
   text-align: center;
@@ -55,7 +60,7 @@ h5 {
   text-align: right;
 }
 
-#return {
+#return_to_home {
   position: absolute; 
   top: 0; 
   right: 0; 
@@ -63,7 +68,7 @@ h5 {
   text-align: right;
 }
 
-#logout {
+#user_welcome {
   position: absolute; 
   top: 0; 
   right: 0; 
@@ -79,11 +84,11 @@ h5 {
   text-align:left;
 }
 
-#tweet1 {
+#tweet {
   width: 400px;
 }
 
-#return3 {
+#save_return {
   position: absolute; 
   top: 0; 
   right: 1.4em; 
@@ -91,7 +96,7 @@ h5 {
  text-align:right;
 }
 
-#return4 {
+#return_to_home2 {
   position: absolute; 
   top: 0; 
   right: 0; 
@@ -99,7 +104,7 @@ h5 {
  text-align:right;
 }
 
-#return5 {
+#return_to_tweets {
   position: absolute; 
   top: 0; 
   right: 1.4em; 
@@ -143,6 +148,7 @@ h5 {
   box-shadow: 0 3px lightblue;
 }
 
+/* Overall style for many of the buttons within Firebase Twitter - "3D" effect stands out */
 button {
   position: relative;
   top: -1px;
@@ -181,21 +187,21 @@ input {
   border-radius: 7px;
 }
 
-#tweet1 {
+#tweet {
   height: 100px;
   width: 500px;
   word-break: break-word;
 }
 
-#logout2 {
+#logout {
   right: 1.4em;
 }
 
-#user1 {
+#screen_name {
   width: 20em;
 }
 
-#exitReturn {
+#exit_return {
   position: absolute;  
   right: 1.4em; 
   width: 100px; 

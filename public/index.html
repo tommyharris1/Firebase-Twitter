@@ -9,95 +9,173 @@
 </head>
 <body>
 <!-- partial:index.partial.html -->
-<!-- 
-  The home page 
--->
-<div id="page1">
+<!-- Starting page (user is not logged in) -->
+<div id="welcome_page">
+  
   <h1 id="title">
     <span>Welcome to Firebase Twitter!</span>
   </h1>
+  
   <div id="center">
-    <span id="login" style="position: relative;top: -5px;"><button>LOGIN</button></span>
-  </div>
-  <div id="center">
-    <input placeholder="E-mail" type="text" id="email1">
-    <input placeholder="Password" type="password" id="pass1">
+    <span id="login" style="position: relative;top: -10px;">
+      <button>LOGIN</button>
+    </span>
   </div>
   
+  <div id="center">
+    <input placeholder="E-mail" type="text" id="login_email">
+    <input placeholder="Password" type="password" id="login_pass">
+  </div>
   
-  <div style="display: none;"><img src="https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png" id="fileupload2"/></div>
   <br><br>
-  <div id="center"><span id="register"><button>REGISTER</button></div></span>
-  <br><br><br>
-  <div id="center"><button id="forgot">Forgot Password?</button></div>
-</div>
-
-<div class="hidden" id="page2">
-  <h1 id="title">
-    <span>Welcome to Firebase Twitter!</span><br><br>
-  </h1>
-  <div id="logout">
-    <div id="hello"></div><br>
-    <button id="logout2">LOGOUT</button>
+  
+  <div id="center">
+    <span id="register">
+      <button>REGISTER</button>
+    </span>
   </div>
-  <div id="settings"><button>USER SETTINGS</button></div>
+  
+  <br><br><br>
+  
+  <div id="center">
+    <button id="forgot">Forgot Password?</button>
+  </div>
 
-  <div id="center"><textarea rows = "5" cols = "60" placeholder = "Tweet" type="text" id="tweet1" size=100></textarea></div>
-
-  <div id="center"><span id="send"><button>SEND</button></span></div><br><br>
-
-  <div id="sessiondata"></div>
 </div>
 
-<div class="hidden" id="page3">
+<!-- Main (tweets) page -->
+<div class="hidden" id="main_page">
+  
+  <h1 id="title">
+    <span>Welcome to Firebase Twitter!</span>
+  </h1>
+  
+  <br><br>
+  
+  <div id="user_welcome">
+    <div id="hello"></div>
+    <br>
+    <button id="logout">LOGOUT</button>
+  </div>
+  
+  <div id="settings">
+    <button>USER SETTINGS</button>
+  </div>
+
+  <div id="center">
+    <textarea rows = "5" cols = "60" placeholder = "Tweet" type="text" id="tweet" size=100>
+    </textarea>
+  </div>
+
+  <div id="center">
+    <span id="send">
+      <button>SEND</button>
+    </span>
+  </div>
+  
+  <br><br>
+  
+  <div id="all_tweets"></div>
+  
+</div>
+
+<!-- Register account page -->
+<div class="hidden" id="register_page">
+  
   <div id="center">
     <h1 id="title">
-      <span>Create Your Firebase Twitter Account</span>
+      <span>Create Your Firebase Twitter Account</span><br><br>
     </h1>
-    <div id="return"><button>Return to Home</button></div>
+    <div id="return_to_home">
+      <button>Return to Home</button>
+    </div>
   </div>
+  
   <div id="center">
-    <input id="user2" placeholder="E-mail" type="text">
-    <input id="pass2" placeholder="Password" type="password">
-    <span id="register2"><br><br><button>REGISTER ACCOUNT</button></span>
+    <input id="register_email" placeholder="E-mail" type="text">
+    <input id="register_pass" placeholder="Password" type="password">
+    <br><br>
+    <span id="register_account">
+      <button>REGISTER ACCOUNT</button>
+    </span>
   </div>
+  
 </div>
 
+<!-- User settings page -->
 <div class="hidden" id="settings_page">
+  
   <h1 id="title">
     <span>User Settings</span>
-  </h1><br>
-  <div id="return3">
+  </h1>
+  
+  <br>
+  
+  <div id="save_return">
     <button>SAVE & RETURN</button>
   </div>
-  <div id="exitReturn">
+  
+  <div id="exit_return">
     <button>EXIT & RETURN</button>
   </div>
+  
   <div id="center">
-    <input placeholder="Screen Name" type="text" id="user1">
-  </div><br>
-  <div id="center"><input type="file" id="fileupload" accept="image/png, image/jpeg, image/webp"/></div><br>
-  <div id="center"><textarea rows="5" cols="60" placeholder="Bio" type="text" id="bio"></textarea></div>
+    <input placeholder="Screen Name" type="text" id="screen_name">
+  </div>
+  
+  <br>
+  
+  <div id="center">
+    <input type="file" id="pic_upload" accept="image/png, image/jpeg, image/webp"/>
+  </div>
+  
+  <br>
+  
+  <div id="center">
+    <textarea rows="5" cols="60" placeholder="Bio" type="text" id="bio">
+    </textarea>
+  </div>
+  
 </div>
 
+<!-- Forgot password page -->
 <div class="hidden" id="forgot_pass_page">
+  
   <h1 id="title">
     <span>Enter Your E-mail Below</span>
   </h1>
+  
   <br>
+  
   <div id="center">
-  <input placeholder="E-mail" type="text" id="email_pass_forgot">
+    <input placeholder="E-mail" type="text" id="email_pass_forgot">
   </div>
-  <div id="center"><button id="send_email">SEND</button></div>
-  <div id="center"><div id="return4"><button>Return to Home</button></div></div>
+  
+  <div id="center">
+    <button id="send_email">SEND</button>
+  </div>
+  
+  <div id="center">
+    <div id="return_to_home2">
+      <button>Return to Home</button>
+    </div>
+  </div>
+  
 </div>
 
+<!-- User profile page -->
 <div class="hidden" id="profile_page">
+  
   <h1 id="title">
-    <span>User's Profile</span><br>
+    <span>User's Profile</span>
+    <br>
   </h1>
-  <div id="return5"><button>Return to Tweets</button></div>
-  <div id="profiledata"></div>
+  
+  <div id="return_to_tweets">
+    <button>Return to Tweets</button>
+  </div>
+  <div id="profile_data"></div>
+  
 </div>
 <!-- partial -->
   <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js'></script>
