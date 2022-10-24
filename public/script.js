@@ -67,7 +67,8 @@ let catchError = (error) => {
 let signIn = () => {
   firebase.auth().signInWithEmailAndPassword($("#login_email").val(), $("#login_pass").val()).then((userCredential) => {
     let user = userCredential.user;
-    userSignInOrRegister(user);
+    if (!user.emailVerified) alert("Please verify your email before logging in.");
+    else userSignInOrRegister(user);
   })
   .catch((error) => {
     catchError(error);
@@ -215,10 +216,12 @@ $("#register_account").on("click", evt => {
       const user = userCredential.user;
       let usersRef = rtdb.ref(db, `/users/${user.uid}`); // Reference to user info in Firebase
       if (usersRef) rtdb.set(usersRef, {email, URL, bio, username}); // Set user info in Firebase
-      alert("Account successfully created.\nWelcome to Firebase Twitter!")
+      alert("Account successfully created.\nPlease check the spam folder of your email for verification.")
       $('#register_page').addClass('hidden');
-      $('#main_page').removeClass('hidden');
-      signInRegister();
+      $('#welcome_page').removeClass('hidden');
+      $('#main_page').addClass('hidden');
+      //signInRegister();
+      user.sendEmailVerification();
       $("#register_email").val("");
       $("#register_pass").val("");
     })
