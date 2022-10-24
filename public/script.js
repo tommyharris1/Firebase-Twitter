@@ -218,9 +218,9 @@ $("#register_account").on("click", evt => {
       alert("Account successfully created.\nWelcome to Firebase Twitter!")
       $('#register_page').addClass('hidden');
       $('#main_page').removeClass('hidden');
+      signInRegister();
       $("#register_email").val("");
       $("#register_pass").val("");
-      signInRegister();
     })
     .catch((error) => {
       catchError(error);
