@@ -209,7 +209,6 @@ $("#register_account").on("click", evt => {
     // Creates user and stores info in Firebase
     firebase.auth().createUserWithEmailAndPassword($("#register_email").val(), $("#register_pass").val()).then((userCredential) => {
       let email = $("#register_email").val();
-      $("#login_email").val(email);
       let URL = "https://twirpz.files.wordpress.com/2015/06/twitter-avi-gender-balanced-figure.png"; // Default profile picture
       let bio = "";
       let username = "";
@@ -220,7 +219,6 @@ $("#register_account").on("click", evt => {
       $('#register_page').addClass('hidden');
       $('#welcome_page').removeClass('hidden');
       $('#main_page').addClass('hidden');
-      //signInRegister();
       user.sendEmailVerification();
       $("#register_email").val("");
       $("#register_pass").val("");
